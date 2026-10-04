@@ -32,11 +32,14 @@ Sunucu ortam değişkenleri:
 | `STATS_INTERVAL_MS` | kapalı | Bağlantı, masa, bellek ve gecikmeyi düzenli yazar |
 | `BOT_DELAY_MS` | 900 | Bot adımları arası bekleme (yük testi için) |
 
-Uygulama (`app/` içinde):
+Uygulama (`app/` içinde). Telefonla denemek için sunucuyu bilgisayarda başlat, telefonu aynı Wi-Fi'ye bağla:
 ```bash
 flutter run                                                    # emülatör (sunucuya 10.0.2.2 üzerinden bağlanır)
 flutter run --dart-define=SERVER_URL=ws://192.168.1.20:2567    # gerçek telefon: bilgisayarın yerel IP'si
 dart analyze
 flutter test
 flutter test test/live_server_test.dart --dart-define=LIVE_SERVER_URL=ws://localhost:2567   # çalışan sunucuya karşı
+flutter test test/screenshot_test.dart --update-goldens --dart-define=SCREENSHOTS=true      # ekran görüntüleri → test/screenshots/
 ```
+
+Sunucu mesajları değişince Flutter testlerindeki örnekleri yenile: `npm run fixtures -w @masa/server`

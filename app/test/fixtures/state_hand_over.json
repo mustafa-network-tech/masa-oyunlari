@@ -1,0 +1,995 @@
+{
+ "t": "state",
+ "room": "ornek-masa",
+ "phase": "handOver",
+ "settings": {
+  "openingMode": "fixed",
+  "hands": 5,
+  "partnership": false,
+  "unopenedPenalty": 202,
+  "speed": "normal"
+ },
+ "host": 0,
+ "you": 0,
+ "seats": [
+  {
+   "name": "Mustafa",
+   "bot": false,
+   "status": "away"
+  },
+  {
+   "name": "Arda",
+   "bot": true,
+   "status": "bot"
+  },
+  {
+   "name": "Elif",
+   "bot": true,
+   "status": "bot"
+  },
+  {
+   "name": "Gül",
+   "bot": true,
+   "status": "bot"
+  }
+ ],
+ "match": {
+  "hand": 1,
+  "hands": 5,
+  "totals": [
+   1,
+   -101,
+   118,
+   27
+  ],
+  "history": [
+   [
+    1,
+    -101,
+    118,
+    27
+   ]
+  ]
+ },
+ "seeding": null,
+ "hand": {
+  "number": 1,
+  "starter": 0,
+  "indicator": {
+   "id": 90,
+   "color": "blue",
+   "number": 13,
+   "fake": false
+  },
+  "okey": {
+   "color": "blue",
+   "number": 1
+  },
+  "stock": 0,
+  "tiles": [
+   {
+    "id": 105,
+    "color": "red",
+    "number": 0,
+    "fake": true
+   }
+  ],
+  "counts": [
+   1,
+   0,
+   9,
+   6
+  ],
+  "discards": [
+   [
+    {
+     "id": 68,
+     "color": "yellow",
+     "number": 4,
+     "fake": false
+    },
+    {
+     "id": 88,
+     "color": "blue",
+     "number": 11,
+     "fake": false
+    },
+    {
+     "id": 65,
+     "color": "yellow",
+     "number": 1,
+     "fake": false
+    },
+    {
+     "id": 40,
+     "color": "black",
+     "number": 2,
+     "fake": false
+    },
+    {
+     "id": 85,
+     "color": "blue",
+     "number": 8,
+     "fake": false
+    },
+    {
+     "id": 79,
+     "color": "blue",
+     "number": 2,
+     "fake": false
+    }
+   ],
+   [
+    {
+     "id": 103,
+     "color": "black",
+     "number": 13,
+     "fake": false
+    },
+    {
+     "id": 45,
+     "color": "black",
+     "number": 7,
+     "fake": false
+    },
+    {
+     "id": 5,
+     "color": "red",
+     "number": 6,
+     "fake": false
+    },
+    {
+     "id": 36,
+     "color": "blue",
+     "number": 11,
+     "fake": false
+    },
+    {
+     "id": 93,
+     "color": "black",
+     "number": 3,
+     "fake": false
+    },
+    {
+     "id": 91,
+     "color": "black",
+     "number": 1,
+     "fake": false
+    }
+   ],
+   [
+    {
+     "id": 92,
+     "color": "black",
+     "number": 2,
+     "fake": false
+    },
+    {
+     "id": 6,
+     "color": "red",
+     "number": 7,
+     "fake": false
+    },
+    {
+     "id": 12,
+     "color": "red",
+     "number": 13,
+     "fake": false
+    },
+    {
+     "id": 100,
+     "color": "black",
+     "number": 10,
+     "fake": false
+    },
+    {
+     "id": 87,
+     "color": "blue",
+     "number": 10,
+     "fake": false
+    }
+   ],
+   [
+    {
+     "id": 57,
+     "color": "red",
+     "number": 6,
+     "fake": false
+    },
+    {
+     "id": 30,
+     "color": "blue",
+     "number": 5,
+     "fake": false
+    },
+    {
+     "id": 95,
+     "color": "black",
+     "number": 5,
+     "fake": false
+    },
+    {
+     "id": 47,
+     "color": "black",
+     "number": 9,
+     "fake": false
+    }
+   ]
+  ],
+  "melds": [
+   {
+    "id": 1,
+    "kind": "run",
+    "owner": 1,
+    "tiles": [
+     {
+      "id": 21,
+      "color": "yellow",
+      "number": 9,
+      "fake": false
+     },
+     {
+      "id": 74,
+      "color": "yellow",
+      "number": 10,
+      "fake": false
+     },
+     {
+      "id": 23,
+      "color": "yellow",
+      "number": 11,
+      "fake": false
+     },
+     {
+      "id": 76,
+      "color": "yellow",
+      "number": 12,
+      "fake": false
+     },
+     {
+      "id": 77,
+      "color": "yellow",
+      "number": 13,
+      "fake": false
+     }
+    ]
+   },
+   {
+    "id": 2,
+    "kind": "run",
+    "owner": 1,
+    "tiles": [
+     {
+      "id": 7,
+      "color": "red",
+      "number": 8,
+      "fake": false
+     },
+     {
+      "id": 60,
+      "color": "red",
+      "number": 9,
+      "fake": false
+     },
+     {
+      "id": 61,
+      "color": "red",
+      "number": 10,
+      "fake": false
+     },
+     {
+      "id": 10,
+      "color": "red",
+      "number": 11,
+      "fake": false
+     }
+    ]
+   },
+   {
+    "id": 3,
+    "kind": "run",
+    "owner": 1,
+    "tiles": [
+     {
+      "id": 66,
+      "color": "yellow",
+      "number": 2,
+      "fake": false
+     },
+     {
+      "id": 15,
+      "color": "yellow",
+      "number": 3,
+      "fake": false
+     },
+     {
+      "id": 16,
+      "color": "yellow",
+      "number": 4,
+      "fake": false
+     },
+     {
+      "id": 17,
+      "color": "yellow",
+      "number": 5,
+      "fake": false
+     },
+     {
+      "id": 70,
+      "color": "yellow",
+      "number": 6,
+      "fake": false
+     },
+     {
+      "id": 71,
+      "color": "yellow",
+      "number": 7,
+      "fake": false
+     },
+     {
+      "id": 20,
+      "color": "yellow",
+      "number": 8,
+      "fake": false
+     }
+    ]
+   },
+   {
+    "id": 4,
+    "kind": "set",
+    "owner": 1,
+    "tiles": [
+     {
+      "id": 55,
+      "color": "red",
+      "number": 4,
+      "fake": false
+     },
+     {
+      "id": 29,
+      "color": "blue",
+      "number": 4,
+      "fake": false
+     },
+     {
+      "id": 94,
+      "color": "black",
+      "number": 4,
+      "fake": false
+     }
+    ]
+   },
+   {
+    "id": 5,
+    "kind": "set",
+    "owner": 1,
+    "tiles": [
+     {
+      "id": 52,
+      "color": "red",
+      "number": 1,
+      "fake": false
+     },
+     {
+      "id": 13,
+      "color": "yellow",
+      "number": 1,
+      "fake": false
+     },
+     {
+      "id": 39,
+      "color": "black",
+      "number": 1,
+      "fake": false
+     },
+     {
+      "id": 104,
+      "color": "red",
+      "number": 0,
+      "fake": true
+     }
+    ]
+   },
+   {
+    "id": 6,
+    "kind": "run",
+    "owner": 1,
+    "tiles": [
+     {
+      "id": 31,
+      "color": "blue",
+      "number": 6,
+      "fake": false
+     },
+     {
+      "id": 32,
+      "color": "blue",
+      "number": 7,
+      "fake": false
+     },
+     {
+      "id": 33,
+      "color": "blue",
+      "number": 8,
+      "fake": false
+     }
+    ]
+   },
+   {
+    "id": 7,
+    "kind": "pair",
+    "owner": 2,
+    "tiles": [
+     {
+      "id": 34,
+      "color": "blue",
+      "number": 9,
+      "fake": false
+     },
+     {
+      "id": 86,
+      "color": "blue",
+      "number": 9,
+      "fake": false
+     }
+    ]
+   },
+   {
+    "id": 8,
+    "kind": "pair",
+    "owner": 2,
+    "tiles": [
+     {
+      "id": 49,
+      "color": "black",
+      "number": 11,
+      "fake": false
+     },
+     {
+      "id": 101,
+      "color": "black",
+      "number": 11,
+      "fake": false
+     }
+    ]
+   },
+   {
+    "id": 9,
+    "kind": "pair",
+    "owner": 2,
+    "tiles": [
+     {
+      "id": 98,
+      "color": "black",
+      "number": 8,
+      "fake": false
+     },
+     {
+      "id": 46,
+      "color": "black",
+      "number": 8,
+      "fake": false
+     }
+    ]
+   },
+   {
+    "id": 10,
+    "kind": "pair",
+    "owner": 2,
+    "tiles": [
+     {
+      "id": 44,
+      "color": "black",
+      "number": 6,
+      "fake": false
+     },
+     {
+      "id": 96,
+      "color": "black",
+      "number": 6,
+      "fake": false
+     }
+    ]
+   },
+   {
+    "id": 11,
+    "kind": "pair",
+    "owner": 2,
+    "tiles": [
+     {
+      "id": 80,
+      "color": "blue",
+      "number": 3,
+      "fake": false
+     },
+     {
+      "id": 28,
+      "color": "blue",
+      "number": 3,
+      "fake": false
+     }
+    ]
+   },
+   {
+    "id": 12,
+    "kind": "set",
+    "owner": 3,
+    "tiles": [
+     {
+      "id": 63,
+      "color": "red",
+      "number": 12,
+      "fake": false
+     },
+     {
+      "id": 37,
+      "color": "blue",
+      "number": 12,
+      "fake": false
+     },
+     {
+      "id": 102,
+      "color": "black",
+      "number": 12,
+      "fake": false
+     }
+    ]
+   },
+   {
+    "id": 13,
+    "kind": "set",
+    "owner": 3,
+    "tiles": [
+     {
+      "id": 62,
+      "color": "red",
+      "number": 11,
+      "fake": false
+     },
+     {
+      "id": 75,
+      "color": "yellow",
+      "number": 11,
+      "fake": false
+     },
+     {
+      "id": 26,
+      "color": "blue",
+      "number": 1,
+      "fake": false
+     }
+    ]
+   },
+   {
+    "id": 14,
+    "kind": "set",
+    "owner": 3,
+    "tiles": [
+     {
+      "id": 9,
+      "color": "red",
+      "number": 10,
+      "fake": false
+     },
+     {
+      "id": 35,
+      "color": "blue",
+      "number": 10,
+      "fake": false
+     },
+     {
+      "id": 48,
+      "color": "black",
+      "number": 10,
+      "fake": false
+     },
+     {
+      "id": 22,
+      "color": "yellow",
+      "number": 10,
+      "fake": false
+     }
+    ]
+   },
+   {
+    "id": 15,
+    "kind": "set",
+    "owner": 3,
+    "tiles": [
+     {
+      "id": 54,
+      "color": "red",
+      "number": 3,
+      "fake": false
+     },
+     {
+      "id": 67,
+      "color": "yellow",
+      "number": 3,
+      "fake": false
+     },
+     {
+      "id": 41,
+      "color": "black",
+      "number": 3,
+      "fake": false
+     }
+    ]
+   },
+   {
+    "id": 16,
+    "kind": "set",
+    "owner": 0,
+    "tiles": [
+     {
+      "id": 64,
+      "color": "red",
+      "number": 13,
+      "fake": false
+     },
+     {
+      "id": 25,
+      "color": "yellow",
+      "number": 13,
+      "fake": false
+     },
+     {
+      "id": 51,
+      "color": "black",
+      "number": 13,
+      "fake": false
+     }
+    ]
+   },
+   {
+    "id": 17,
+    "kind": "set",
+    "owner": 0,
+    "tiles": [
+     {
+      "id": 11,
+      "color": "red",
+      "number": 12,
+      "fake": false
+     },
+     {
+      "id": 24,
+      "color": "yellow",
+      "number": 12,
+      "fake": false
+     },
+     {
+      "id": 50,
+      "color": "black",
+      "number": 12,
+      "fake": false
+     }
+    ]
+   },
+   {
+    "id": 18,
+    "kind": "set",
+    "owner": 0,
+    "tiles": [
+     {
+      "id": 8,
+      "color": "red",
+      "number": 9,
+      "fake": false
+     },
+     {
+      "id": 73,
+      "color": "yellow",
+      "number": 9,
+      "fake": false
+     },
+     {
+      "id": 99,
+      "color": "black",
+      "number": 9,
+      "fake": false
+     }
+    ]
+   },
+   {
+    "id": 19,
+    "kind": "set",
+    "owner": 0,
+    "tiles": [
+     {
+      "id": 4,
+      "color": "red",
+      "number": 5,
+      "fake": false
+     },
+     {
+      "id": 82,
+      "color": "blue",
+      "number": 5,
+      "fake": false
+     },
+     {
+      "id": 43,
+      "color": "black",
+      "number": 5,
+      "fake": false
+     }
+    ]
+   },
+   {
+    "id": 20,
+    "kind": "run",
+    "owner": 0,
+    "tiles": [
+     {
+      "id": 53,
+      "color": "red",
+      "number": 2,
+      "fake": false
+     },
+     {
+      "id": 2,
+      "color": "red",
+      "number": 3,
+      "fake": false
+     },
+     {
+      "id": 3,
+      "color": "red",
+      "number": 4,
+      "fake": false
+     },
+     {
+      "id": 56,
+      "color": "red",
+      "number": 5,
+      "fake": false
+     },
+     {
+      "id": 78,
+      "color": "blue",
+      "number": 1,
+      "fake": false
+     },
+     {
+      "id": 58,
+      "color": "red",
+      "number": 7,
+      "fake": false
+     },
+     {
+      "id": 59,
+      "color": "red",
+      "number": 8,
+      "fake": false
+     }
+    ]
+   }
+  ],
+  "opened": [
+   "sets",
+   "sets",
+   "pairs",
+   "sets"
+  ],
+  "penalties": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "requirement": {
+   "points": 101,
+   "pairs": 5
+  },
+  "turn": {
+   "seat": 1,
+   "number": 22,
+   "phase": "play",
+   "takenTileId": null,
+   "mustDrawFromStock": false
+  },
+  "clock": null
+ },
+ "result": {
+  "finisher": 1,
+  "finish": {
+   "okey": false,
+   "elden": false,
+   "pairs": false,
+   "multiplier": 1
+  },
+  "rows": [
+   {
+    "seat": 0,
+    "base": 1,
+    "penalties": 0,
+    "total": 1
+   },
+   {
+    "seat": 1,
+    "base": -101,
+    "penalties": 0,
+    "total": -101
+   },
+   {
+    "seat": 2,
+    "base": 118,
+    "penalties": 0,
+    "total": 118
+   },
+   {
+    "seat": 3,
+    "base": 27,
+    "penalties": 0,
+    "total": 27
+   }
+  ],
+  "hands": [
+   [
+    {
+     "id": 105,
+     "color": "red",
+     "number": 0,
+     "fake": true
+    }
+   ],
+   [],
+   [
+    {
+     "id": 18,
+     "color": "yellow",
+     "number": 6,
+     "fake": false
+    },
+    {
+     "id": 69,
+     "color": "yellow",
+     "number": 5,
+     "fake": false
+    },
+    {
+     "id": 89,
+     "color": "blue",
+     "number": 12,
+     "fake": false
+    },
+    {
+     "id": 27,
+     "color": "blue",
+     "number": 2,
+     "fake": false
+    },
+    {
+     "id": 38,
+     "color": "blue",
+     "number": 13,
+     "fake": false
+    },
+    {
+     "id": 81,
+     "color": "blue",
+     "number": 4,
+     "fake": false
+    },
+    {
+     "id": 84,
+     "color": "blue",
+     "number": 7,
+     "fake": false
+    },
+    {
+     "id": 83,
+     "color": "blue",
+     "number": 6,
+     "fake": false
+    },
+    {
+     "id": 42,
+     "color": "black",
+     "number": 4,
+     "fake": false
+    }
+   ],
+   [
+    {
+     "id": 1,
+     "color": "red",
+     "number": 2,
+     "fake": false
+    },
+    {
+     "id": 0,
+     "color": "red",
+     "number": 1,
+     "fake": false
+    },
+    {
+     "id": 19,
+     "color": "yellow",
+     "number": 7,
+     "fake": false
+    },
+    {
+     "id": 14,
+     "color": "yellow",
+     "number": 2,
+     "fake": false
+    },
+    {
+     "id": 97,
+     "color": "black",
+     "number": 7,
+     "fake": false
+    },
+    {
+     "id": 72,
+     "color": "yellow",
+     "number": 8,
+     "fake": false
+    }
+   ]
+  ],
+  "fairness": {
+   "commit": "48fb2846c71450b9c2aadeffa356c57d6b8b04b098df19dad6b5e1a49e11993b",
+   "serverSeed": "704301bd2d932087c7b68382e3f2b8813b88340f056475190c7c27a2fe3e2b3d",
+   "clientSeeds": [
+    "5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a",
+    "",
+    "",
+    ""
+   ],
+   "seed": "3f5fa3c666741315b699691fcd06f134a20a091d21d963128d41661adebcbab6"
+  }
+ },
+ "events": [
+  {
+   "type": "discarded",
+   "seat": 1,
+   "tile": {
+    "id": 91,
+    "color": "black",
+    "number": 1,
+    "fake": false
+   }
+  },
+  {
+   "type": "handOver",
+   "result": {
+    "finisher": 1,
+    "finish": {
+     "okey": false,
+     "elden": false,
+     "pairs": false,
+     "multiplier": 1
+    },
+    "rows": [
+     {
+      "seat": 0,
+      "base": 1,
+      "penalties": 0,
+      "total": 1
+     },
+     {
+      "seat": 1,
+      "base": -101,
+      "penalties": 0,
+      "total": -101
+     },
+     {
+      "seat": 2,
+      "base": 118,
+      "penalties": 0,
+      "total": 118
+     },
+     {
+      "seat": 3,
+      "base": 27,
+      "penalties": 0,
+      "total": 27
+     }
+    ]
+   }
+  }
+ ]
+}

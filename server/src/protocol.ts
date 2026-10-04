@@ -12,6 +12,12 @@ export interface TableSettings extends okey101.TableConfig {
   speed: Speed;
 }
 
+/** Hazır tepkiler. Serbest sohbet yok. Metinleri uygulama gösterir. */
+export const REACTIONS = ['selam', 'helal', 'sans', 'hadi', 'pardon', 'gule'] as const;
+export type Reaction = (typeof REACTIONS)[number];
+
+export type ArrangeMode = 'sets' | 'pairs';
+
 export const DEFAULT_SETTINGS: TableSettings = { ...okey101.DEFAULT_CONFIG, speed: 'normal' };
 
 export type ClientMessage =
@@ -31,7 +37,10 @@ export type ClientMessage =
    */
   | { t: 'act'; seq: number; hand: number; turn: number; action: okey101.Action }
   /** "Uzakta" durumundan dönüş. */
-  | { t: 'back' };
+  | { t: 'back' }
+  /** Otomatik diz: elindeki en iyi perleri (sets) veya çiftleri (pairs) ister. */
+  | { t: 'arrange'; mode: ArrangeMode }
+  | { t: 'react'; id: Reaction };
 
 export type ServerMessage =
   | { t: 'welcome'; protocol: number; clientId: string }
@@ -40,6 +49,9 @@ export type ServerMessage =
   | { t: 'seated'; room: string; seat: okey101.Seat; token: string; lastSeq: number }
   | TableView
   | { t: 'ack'; seq: number; duplicate?: true }
+  /** Otomatik diz cevabı: önerilen perler, değeri büyükten küçüğe. */
+  | { t: 'arrangement'; mode: ArrangeMode; melds: okey101.MeldInput[] }
+  | { t: 'reaction'; seat: okey101.Seat; id: Reaction }
   | { t: 'error'; code: ErrorCode; message: string; seq?: number; reason?: okey101.ActionError };
 
 export type ErrorCode =
@@ -114,6 +126,10 @@ export function parseClientMessage(raw: string): ClientMessage | null {
       return isCount(msg.hand) && typeof msg.seed === 'string' && isValidSeed(msg.seed)
         ? { t: 'seed', hand: msg.hand, seed: msg.seed }
         : null;
+    case 'arrange':
+      return msg.mode === 'sets' || msg.mode === 'pairs' ? { t: 'arrange', mode: msg.mode } : null;
+    case 'react':
+      return REACTIONS.includes(msg.id as Reaction) ? { t: 'react', id: msg.id as Reaction } : null;
     case 'act': {
       if (!isCount(msg.seq) || !isCount(msg.hand) || !isCount(msg.turn)) return null;
       const action = parseAction(msg.action);

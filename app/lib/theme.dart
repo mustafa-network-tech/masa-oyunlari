@@ -11,16 +11,17 @@ abstract final class MasaColors {
 }
 
 ThemeData buildMasaTheme() {
-  final scheme = ColorScheme.fromSeed(
-    seedColor: MasaColors.turkuaz,
-    brightness: Brightness.dark,
-  ).copyWith(
-    primary: MasaColors.turkuaz,
-    secondary: MasaColors.altin,
-    surface: MasaColors.zemin,
-    onSurface: MasaColors.kirikBeyaz,
-    error: MasaColors.hata,
-  );
+  final scheme =
+      ColorScheme.fromSeed(
+        seedColor: MasaColors.turkuaz,
+        brightness: Brightness.dark,
+      ).copyWith(
+        primary: MasaColors.turkuaz,
+        secondary: MasaColors.altin,
+        surface: MasaColors.zemin,
+        onSurface: MasaColors.kirikBeyaz,
+        error: MasaColors.hata,
+      );
   return ThemeData(
     useMaterial3: true,
     colorScheme: scheme,

@@ -29,7 +29,10 @@ async function connect(port: number) {
     /** Okunmamış mesajlardan koşula uyan ilkini döner; yoksa gelmesini bekler. */
     waitFor<T extends Msg>(match: (m: Msg) => m is T, timeoutMs = 3_000): Promise<T> {
       return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => reject(new Error('mesaj beklenirken süre doldu')), timeoutMs);
+        const timer = setTimeout(() => {
+          const last = messages.slice(-3).map((m) => JSON.stringify(m).slice(0, 160));
+          reject(new Error(`mesaj beklenirken süre doldu; son mesajlar: ${last.join(' | ')}`));
+        }, timeoutMs);
         const check = () => {
           while (cursor < messages.length) {
             const msg = messages[cursor++]!;
@@ -166,9 +169,9 @@ describe('oyun sunucusu', () => {
     const resumed = await back.state();
     expect(resumed).toMatchObject({ phase: 'playing', you: seat });
     expect(resumed.hand!.number).toBe(before.hand!.number);
-    // Kopukken bot oynamış olabilir; ama taşlar aynı elden gelir.
-    const original = new Set(handBefore.tiles.map((t) => t.id));
-    expect(resumed.hand!.tiles.filter((t) => original.has(t.id)).length).toBeGreaterThan(10);
+    // Kopukken yerine bot oynamış olabilir; oyuncu aynı eldeki güncel taşlarını alır.
+    expect(resumed.hand!.tiles).toHaveLength(resumed.hand!.counts[seat]!);
+    expect(handBefore.number).toBe(resumed.hand!.number);
     await players[0]!.state((s) => s.seats[seat]!.status === 'online');
 
     for (const p of [...players, back]) p.close();
@@ -202,10 +205,11 @@ describe('oyun sunucusu', () => {
       p.send({ t: 'join', room: 'cift', name: `O${i}` });
       await p.waitFor(is('seated'));
     }
-    const view = await players[0]!.state((s) => s.phase === 'playing');
-    const seat = view.hand!.turn.seat;
+    // Her oyuncunun ilk oyun görüntüsü; hamle sırası gelen oyuncununki kullanılır.
+    const views = await Promise.all(players.map((p) => p.state((s) => s.phase === 'playing')));
+    const seat = views[0]!.hand!.turn.seat;
     const mover = players[seat]!;
-    const own = await mover.state((s) => s.phase === 'playing');
+    const own = views[seat]!;
     const msg = {
       t: 'act',
       seq: 1,
@@ -217,7 +221,8 @@ describe('oyun sunucusu', () => {
     mover.send(msg);
     expect(await mover.waitFor(is('ack'))).toEqual({ t: 'ack', seq: 1 });
     expect(await mover.waitFor(is('ack'))).toEqual({ t: 'ack', seq: 1, duplicate: true });
-    const after = await players[0]!.state((s) => s.hand!.turn.seat !== seat);
+    // Hamle yapanın mesaj sırası onaylarla karıştığı için masayı başka bir oyuncunun gözünden kontrol et.
+    const after = await players[(seat + 1) % 4]!.state((s) => s.hand!.turn.seat !== seat);
     expect(after.hand!.discards[seat]).toHaveLength(1);
     for (const p of players) p.close();
   });

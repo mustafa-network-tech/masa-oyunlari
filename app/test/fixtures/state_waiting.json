@@ -1,0 +1,29 @@
+{
+ "t": "state",
+ "room": "ornek-masa",
+ "phase": "waiting",
+ "settings": {
+  "openingMode": "fixed",
+  "hands": 5,
+  "partnership": false,
+  "unopenedPenalty": 202,
+  "speed": "normal"
+ },
+ "host": 0,
+ "you": 0,
+ "seats": [
+  {
+   "name": "Mustafa",
+   "bot": false,
+   "status": "online"
+  },
+  null,
+  null,
+  null
+ ],
+ "match": null,
+ "seeding": null,
+ "hand": null,
+ "result": null,
+ "events": []
+}

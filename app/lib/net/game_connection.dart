@@ -23,6 +23,16 @@ class GameConnection extends ChangeNotifier {
   int? latencyMs;
   String? lastError;
 
+  /// Gelen bütün mesajlar (oyun ekranı onay, hata, otomatik diz ve tepkileri buradan dinler).
+  Stream<ServerMessage> get messages => _messages.stream;
+  final _messages = StreamController<ServerMessage>.broadcast();
+
+  /// Koltuktan işlenen son hamle numarası; yeniden bağlanınca sunucudan gelir.
+  int lastSeq = 0;
+
+  /// El numarasına göre bu telefonun gönderdiği Adil Oyun tohumları.
+  final seeds = <int, String>{};
+
   WebSocketChannel? _channel;
   StreamSubscription<dynamic>? _subscription;
   Timer? _pingTimer;
@@ -51,12 +61,36 @@ class GameConnection extends ChangeNotifier {
     _setStatus(ConnectionStatus.disconnected);
   }
 
-  void join(String roomName, String playerName) {
+  void join(
+    String roomName,
+    String playerName, [
+    Map<String, Object?>? settings,
+  ]) {
     _roomName = roomName;
     _playerName = playerName;
     _seatToken = null;
-    _send(joinMessage(roomName, playerName));
+    _seededHand = 0;
+    seeds.clear();
+    _send(joinMessage(roomName, playerName, settings));
   }
+
+  /// Bir masada oturuyor muyuz? Bağlantı geçici olarak kopsa da true kalır (koltuğa dönülecek).
+  bool get inTable => _roomName != null;
+
+  /// Testlerde sunucu olmadan masa görüntüsü vermek için.
+  @visibleForTesting
+  void debugSetRoom(TableSnapshot snapshot, {int? seat}) {
+    _roomName = snapshot.room;
+    this.seat = seat ?? this.seat;
+    debugReceive(snapshot.json);
+  }
+
+  /// Testlerde sunucudan mesaj gelmiş gibi işler.
+  @visibleForTesting
+  void debugReceive(Map<String, Object?> json) => _onData(jsonEncode(json));
+
+  /// Bağlıysa mesajı gönderir.
+  void send(Map<String, Object?> msg) => _send(msg);
 
   void leave() {
     _roomName = null;
@@ -97,6 +131,7 @@ class GameConnection extends ChangeNotifier {
   void _onData(dynamic data) {
     if (data is! String) return;
     final msg = ServerMessage.parse(jsonDecode(data) as Map<String, Object?>);
+    if (msg != null) _messages.add(msg);
     switch (msg) {
       case Welcome(:final protocol, clientId: final id):
         if (protocol != protocolVersion) {
@@ -121,18 +156,21 @@ class GameConnection extends ChangeNotifier {
           latencyMs = DateTime.now().millisecondsSinceEpoch - sentAt;
           notifyListeners();
         }
-      case Seated(:final token, seat: final s):
+      case Seated(:final token, seat: final s, lastSeq: final seq):
         _seatToken = token;
         seat = s;
+        lastSeq = seq;
         notifyListeners();
       case TableSnapshot(:final seedingHand):
         room = msg;
         if (seedingHand != null && seedingHand != _seededHand) {
           _seededHand = seedingHand;
-          _send(seedMessage(seedingHand, _newSeed()));
+          final seed = _newSeed();
+          seeds[seedingHand] = seed;
+          _send(seedMessage(seedingHand, seed));
         }
         notifyListeners();
-      case Ack():
+      case Ack() || Arrangement() || ReactionMessage():
         break;
       case ServerError(:final code, :final message):
         lastError = message;
@@ -174,9 +212,9 @@ class GameConnection extends ChangeNotifier {
 
   /// Adil Oyun: cihazda üretilen 32 baytlık rastgele tohum (64 hex karakter).
   String _newSeed() => [
-        for (var i = 0; i < 32; i++)
-          _random.nextInt(256).toRadixString(16).padLeft(2, '0'),
-      ].join();
+    for (var i = 0; i < 32; i++)
+      _random.nextInt(256).toRadixString(16).padLeft(2, '0'),
+  ].join();
 
   void _send(Map<String, Object?> msg) {
     if (status != ConnectionStatus.connected) return;
@@ -201,6 +239,7 @@ class GameConnection extends ChangeNotifier {
   @override
   void dispose() {
     disconnect();
+    _messages.close();
     super.dispose();
   }
 }

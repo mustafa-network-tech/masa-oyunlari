@@ -100,12 +100,19 @@ Otomatik testlerde 4 bağlantılı bir masada bağlantı kesilip yeni bağlantı
 ## Faz 5 — 101 oyun ekranı
 **Hedef:** Rakiplerden daha akıcı ve şık bir masa deneyimi.
 
-- [ ] Modern çini temasında masa, ıstaka ve taşlar
-- [ ] Sürükle-bırak, otomatik dizme (seriye göre / çifte göre)
-- [ ] Açma ve işleme ekranı, puan göstergesi ("açman için 23 puan daha lazım")
-- [ ] Animasyonlar ve sesler
-- [ ] Hazır tepkiler, el sonu puan tablosu, "🛡️ Adil Oyun Doğrulandı" ekranı
-- [ ] Farklı telefon boyutları ve eski/yavaş cihazlarda test
+- [x] Modern çini temasında masa, ıstaka ve taşlar (yatay ekran)
+- [x] Sürükle-bırak (ıstakada taşıma, desteden/yerden çekme, atma, pere işleme), otomatik dizme (seri / çift)
+- [x] Açma ve işleme: ıstakada boşlukla ayrılan gruplar per sayılır, değeri altında yazar; "açman için 23 puan daha lazım"
+- [x] Animasyonlar (taş kayma, belirme, yığın, per) ve sesler (taş, sıra sende, per, ceza, el sonu; sentetik, geçici)
+- [x] Hazır tepkiler, el sonu puan tablosu, maç sonu ekranı
+- [x] "🛡️ Adil Oyun Doğrulandı": telefon el sonunda dağıtımı kendisi doğrular (sunucu tohumu, kendi tohumu, eline gelen taşlar)
+- [x] Botlara gerçek isimler (Mustafa, Ayşe, Arda…), yanlarında her zaman "BOT" etiketi
+- [x] Farklı ekran boyutları: 640×320, 800×360, 915×412 ve tablet görüntüleriyle kontrol edildi
+- [ ] Eski/yavaş cihazda deneme (Mustafa)
+- [ ] Mustafa'nın botla oynayıp değerlendirmesi (Faz 3'ten)
+- [ ] 4 telefonla internet kesme denemesi (Faz 4'ten)
+
+Geçici ana sayfa: "Botlarla oyna", "Arkadaşlarla masa kur" (masa kodu), "Koda katıl", masa ayarları. Gerçek lobi ve eşleşme Faz 6'da.
 
 **Çıkış kriteri:** Mustafa ve 3 arkadaşı telefonlarından tam bir maçı sorunsuz oynuyor.
 

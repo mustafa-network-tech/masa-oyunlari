@@ -141,6 +141,10 @@ export function createGameServer(options: GameServerOptions): Promise<GameServer
           return table.act(client, msg);
         case 'back':
           return table.back(client);
+        case 'arrange':
+          return table.arrange(client, msg.mode);
+        case 'react':
+          return table.react(client, msg.id);
       }
     });
 

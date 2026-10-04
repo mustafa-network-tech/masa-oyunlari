@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { combineSeeds, commitSeed, okey101 } from '@masa/engine';
 import { replayHand, type HandLog } from '../src/handLog.ts';
 import { DEFAULT_SETTINGS, type ServerMessage, type TableSettings } from '../src/protocol.ts';
-import { Table, type Timing } from '../src/table.ts';
+import { BOT_NAMES, Table, type Timing } from '../src/table.ts';
 import type { TableView } from '../src/view.ts';
 
 const MOVE_MS = 1_000;
@@ -116,6 +116,19 @@ describe('101 masası', () => {
       table.start(host);
       expect(host.state.seats.map((s) => s?.bot)).toEqual([false, false, true, true]);
       expect(host.state.seats[2]).toMatchObject({ status: 'bot' });
+    });
+
+    it('botlar listeden gerçek isimler alır; isimler masadakilerle çakışmaz', () => {
+      for (let i = 0; i < 50; i++) {
+        const { table } = setup();
+        const host = new FakePlayer('host');
+        table.join(host, 'Mustafa');
+        table.start(host);
+        const names = host.state.seats.map((s) => s!.name);
+        expect(new Set(names.map((n) => n.toLocaleLowerCase('tr'))).size).toBe(4);
+        for (const name of names.slice(1)) expect(BOT_NAMES).toContain(name);
+        table.close();
+      }
     });
 
     it('oyun başladıktan sonra yeni oyuncu oturamaz', () => {
@@ -380,6 +393,34 @@ describe('101 masası', () => {
       expect(host.state.phase).toBe('seeding');
       expect(host.state.seeding!.hand).toBe(2);
       expect(host.state.match!.totals).toEqual(result!.rows.map((r) => r.total));
+    });
+  });
+  describe('otomatik diz ve tepkiler', () => {
+    it('otomatik diz oyuncunun kendi taşlarından geçerli perler önerir', () => {
+      const { table, players } = startFourPlayers();
+      const player = players[0]!;
+      const own = new Set(player.state.hand!.tiles.map((t) => t.id));
+      for (const mode of ['sets', 'pairs'] as const) {
+        table.arrange(player, mode);
+        const msg = player.last;
+        expect(msg).toMatchObject({ t: 'arrangement', mode });
+        if (msg?.t !== 'arrangement') throw new Error();
+        for (const meld of msg.melds) {
+          expect(meld.tileIds.every((id) => own.has(id))).toBe(true);
+          if (mode === 'pairs') expect(meld.kind).toBe('pair');
+        }
+      }
+    });
+
+    it('tepki herkese gider, art arda gönderilen yok sayılır', () => {
+      const { table, players } = startFourPlayers();
+      table.react(players[1]!, 'helal');
+      for (const p of players) expect(p.last).toEqual({ t: 'reaction', seat: 1, id: 'helal' });
+      table.react(players[1]!, 'hadi');
+      expect(players[0]!.last).toEqual({ t: 'reaction', seat: 1, id: 'helal' });
+      vi.advanceTimersByTime(2_000);
+      table.react(players[1]!, 'hadi');
+      expect(players[0]!.last).toEqual({ t: 'reaction', seat: 1, id: 'hadi' });
     });
   });
 });

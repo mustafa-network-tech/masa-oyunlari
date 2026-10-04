@@ -8,10 +8,18 @@
 // - Bağlantısı kopmuş veya uzaktaki oyuncunun yerine bot oynar. Kopan oyuncu süre (60 sn) içinde dönerse
 //   aynı koltuğa oturur; dönmezse koltuk kalıcı olarak bota geçer.
 
-import { randomBytes } from 'node:crypto';
+import { randomBytes, randomInt } from 'node:crypto';
 import { combineSeeds, commitSeed, createServerSeed, SeededRandom, okey101 } from '@masa/engine';
 import type { ActionSource, HandLog } from './handLog.ts';
-import { ERROR_MESSAGES, type ClientMessage, type ErrorCode, type ServerMessage, type TableSettings } from './protocol.ts';
+import {
+  ERROR_MESSAGES,
+  type ArrangeMode,
+  type ClientMessage,
+  type ErrorCode,
+  type Reaction,
+  type ServerMessage,
+  type TableSettings,
+} from './protocol.ts';
 import type { ClockView, HandView, SeatView, TablePhase, TableView } from './view.ts';
 
 type Seat = okey101.Seat;
@@ -72,6 +80,7 @@ interface SeatState {
   graceTimer: NodeJS.Timeout | null;
   /** Bu elin Adil Oyun tohumu. */
   seed: string;
+  lastReactionAt: number;
 }
 
 interface Clock {
@@ -83,6 +92,14 @@ interface Clock {
 const AWAY_AFTER_AUTO_MOVES = 2;
 const MAX_BOT_ACTIONS_PER_TURN = 60;
 const BOT_LEVEL: okey101.BotLevel = 'medium';
+const REACTION_COOLDOWN_MS = 2_000;
+
+/** Bot isimleri. Botlar arayüzde her zaman "BOT" etiketiyle görünür. */
+export const BOT_NAMES = [
+  'Mustafa', 'Ayşe', 'Arda', 'Ferdane', 'Filiz', 'Oktay', 'Necla', 'Hasan', 'Zeynep', 'Emre',
+  'Elif', 'Murat', 'Selin', 'Kemal', 'Derya', 'Burak', 'Gül', 'Hakan', 'Sevgi', 'Cem',
+  'Leyla', 'Orhan', 'Nur', 'Tuncay', 'Hülya', 'Serkan', 'Aysel', 'Yusuf', 'Melek', 'Kadir',
+];
 
 export class Table {
   readonly room: string;
@@ -133,6 +150,7 @@ export class Table {
       bank: 0,
       graceTimer: null,
       seed: '',
+      lastReactionAt: 0,
     };
     this.host ??= seat;
     player.send({ t: 'seated', room: this.room, seat, token, lastSeq: 0 });
@@ -196,10 +214,13 @@ export class Table {
     if (seat === undefined) return void this.fail(player, 'notInRoom');
     if (this.phase !== 'waiting') return void this.fail(player, 'inProgress');
     if (seat !== this.host) return void this.fail(player, 'notHost');
+    // Masadakilerle aynı olmayan, birbirinden farklı isimler.
+    const taken = new Set(this.seats.map((st) => st?.name.toLocaleLowerCase('tr')));
+    const names = BOT_NAMES.filter((n) => !taken.has(n.toLocaleLowerCase('tr')));
     for (const s of SEATS) {
       if (this.seats[s]) continue;
       this.seats[s] = {
-        name: `Bot ${s + 1}`,
+        name: names.splice(randomInt(names.length), 1)[0]!,
         bot: true,
         player: null,
         token: null,
@@ -209,6 +230,7 @@ export class Table {
         bank: 0,
         graceTimer: null,
         seed: '',
+        lastReactionAt: 0,
       };
     }
     this.beginSeeding(1);
@@ -260,6 +282,28 @@ export class Table {
     if (!state.away) return;
     this.markBack(state);
     this.broadcast();
+  }
+
+  /** Otomatik diz: oyuncunun elindeki en iyi perleri veya çiftleri önerir. Masayı değiştirmez. */
+  arrange(player: Player, mode: ArrangeMode): void {
+    const seat = this.seatOf(player);
+    if (seat === undefined) return void this.fail(player, 'notInRoom');
+    if (!this.match || this.phase === 'seeding') return void this.fail(player, 'notPlaying');
+    const hand = this.match.hand;
+    const tiles = hand.hands[seat]!;
+    const plan = mode === 'pairs' ? okey101.bestPairs(tiles, hand.okey) : okey101.bestMelds(tiles, hand.okey);
+    player.send({ t: 'arrangement', mode, melds: plan.melds });
+  }
+
+  /** Hazır tepki. Masayı rahatsız etmemek için koltuk başına 2 sn'de bir. */
+  react(player: Player, id: Reaction): void {
+    const seat = this.seatOf(player);
+    if (seat === undefined) return void this.fail(player, 'notInRoom');
+    const state = this.seats[seat]!;
+    const now = Date.now();
+    if (now - state.lastReactionAt < REACTION_COOLDOWN_MS) return;
+    state.lastReactionAt = now;
+    for (const s of this.seats) s?.player?.send({ t: 'reaction', seat, id });
   }
 
   close(): void {

@@ -4,18 +4,55 @@ const protocolVersion = 2;
 
 Map<String, Object?> pingMessage(int n) => {'t': 'ping', 'n': n};
 
-Map<String, Object?> joinMessage(String room, String name) =>
-    {'t': 'join', 'room': room, 'name': name};
+Map<String, Object?> joinMessage(
+  String room,
+  String name, [
+  Map<String, Object?>? settings,
+]) => {'t': 'join', 'room': room, 'name': name, 'settings': ?settings};
 
-Map<String, Object?> resumeMessage(String room, String token) =>
-    {'t': 'resume', 'room': room, 'token': token};
+Map<String, Object?> resumeMessage(String room, String token) => {
+  't': 'resume',
+  'room': room,
+  'token': token,
+};
 
 Map<String, Object?> leaveMessage() => {'t': 'leave'};
 
 Map<String, Object?> startMessage() => {'t': 'start'};
 
-Map<String, Object?> seedMessage(int hand, String seed) =>
-    {'t': 'seed', 'hand': hand, 'seed': seed};
+Map<String, Object?> seedMessage(int hand, String seed) => {
+  't': 'seed',
+  'hand': hand,
+  'seed': seed,
+};
+
+/// Oyun hamlesi. [seq] her koltukta artar; [hand] ve [turn] oyuncunun gördüğü el ve tur.
+Map<String, Object?> actMessage(
+  int seq,
+  int hand,
+  int turn,
+  Map<String, Object?> action,
+) => {'t': 'act', 'seq': seq, 'hand': hand, 'turn': turn, 'action': action};
+
+Map<String, Object?> backMessage() => {'t': 'back'};
+
+/// Otomatik diz: [mode] sets (seri/küt) veya pairs (çift).
+Map<String, Object?> arrangeMessage(String mode) => {
+  't': 'arrange',
+  'mode': mode,
+};
+
+Map<String, Object?> reactMessage(String id) => {'t': 'react', 'id': id};
+
+/// Hazır tepkiler. Kimlikler sunucuyla aynı: server/src/protocol.ts REACTIONS
+const reactions = {
+  'selam': '👋 Selam',
+  'helal': '👏 Helal olsun',
+  'sans': '🍀 Şanslıydın',
+  'hadi': '⏳ Hadi ama',
+  'pardon': '🙏 Kusura bakma',
+  'gule': '😄 Güle güle',
+};
 
 sealed class ServerMessage {
   const ServerMessage();
@@ -41,8 +78,19 @@ sealed class ServerMessage {
         return TableSnapshot.fromJson(json);
       case 'ack':
         return Ack(json['seq'] as int, duplicate: json['duplicate'] == true);
+      case 'arrangement':
+        return Arrangement(json['mode'] as String, [
+          for (final m in json['melds'] as List)
+            ((m as Map)['tileIds'] as List).cast<int>(),
+        ]);
+      case 'reaction':
+        return ReactionMessage(json['seat'] as int, json['id'] as String);
       case 'error':
-        return ServerError(json['code'] as String, json['message'] as String);
+        return ServerError(
+          json['code'] as String,
+          json['message'] as String,
+          reason: json['reason'] as String?,
+        );
       default:
         return null;
     }
@@ -116,8 +164,24 @@ final class Ack extends ServerMessage {
   final bool duplicate;
 }
 
+/// Otomatik diz cevabı: perlerin taş kimlikleri, değeri büyükten küçüğe.
+final class Arrangement extends ServerMessage {
+  const Arrangement(this.mode, this.melds);
+  final String mode;
+  final List<List<int>> melds;
+}
+
+final class ReactionMessage extends ServerMessage {
+  const ReactionMessage(this.seat, this.id);
+  final int seat;
+  final String id;
+}
+
 final class ServerError extends ServerMessage {
-  const ServerError(this.code, this.message);
+  const ServerError(this.code, this.message, {this.reason});
   final String code;
   final String message;
+
+  /// Kural dışı hamlenin sebebi (motordaki ActionError).
+  final String? reason;
 }

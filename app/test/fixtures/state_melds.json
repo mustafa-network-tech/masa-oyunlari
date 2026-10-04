@@ -1,0 +1,367 @@
+{
+ "t": "state",
+ "room": "ornek-masa",
+ "phase": "playing",
+ "settings": {
+  "openingMode": "fixed",
+  "hands": 5,
+  "partnership": false,
+  "unopenedPenalty": 202,
+  "speed": "normal"
+ },
+ "host": 0,
+ "you": 0,
+ "seats": [
+  {
+   "name": "Mustafa",
+   "bot": false,
+   "status": "online"
+  },
+  {
+   "name": "Arda",
+   "bot": true,
+   "status": "bot"
+  },
+  {
+   "name": "Elif",
+   "bot": true,
+   "status": "bot"
+  },
+  {
+   "name": "Gül",
+   "bot": true,
+   "status": "bot"
+  }
+ ],
+ "match": {
+  "hand": 1,
+  "hands": 5,
+  "totals": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "history": []
+ },
+ "seeding": null,
+ "hand": {
+  "number": 1,
+  "starter": 0,
+  "indicator": {
+   "id": 90,
+   "color": "blue",
+   "number": 13,
+   "fake": false
+  },
+  "okey": {
+   "color": "blue",
+   "number": 1
+  },
+  "stock": 19,
+  "tiles": [
+   {
+    "id": 50,
+    "color": "black",
+    "number": 12,
+    "fake": false
+   },
+   {
+    "id": 22,
+    "color": "yellow",
+    "number": 10,
+    "fake": false
+   },
+   {
+    "id": 64,
+    "color": "red",
+    "number": 13,
+    "fake": false
+   },
+   {
+    "id": 4,
+    "color": "red",
+    "number": 5,
+    "fake": false
+   },
+   {
+    "id": 43,
+    "color": "black",
+    "number": 5,
+    "fake": false
+   },
+   {
+    "id": 59,
+    "color": "red",
+    "number": 8,
+    "fake": false
+   },
+   {
+    "id": 40,
+    "color": "black",
+    "number": 2,
+    "fake": false
+   },
+   {
+    "id": 7,
+    "color": "red",
+    "number": 8,
+    "fake": false
+   },
+   {
+    "id": 99,
+    "color": "black",
+    "number": 9,
+    "fake": false
+   },
+   {
+    "id": 51,
+    "color": "black",
+    "number": 13,
+    "fake": false
+   },
+   {
+    "id": 73,
+    "color": "yellow",
+    "number": 9,
+    "fake": false
+   },
+   {
+    "id": 79,
+    "color": "blue",
+    "number": 2,
+    "fake": false
+   },
+   {
+    "id": 58,
+    "color": "red",
+    "number": 7,
+    "fake": false
+   },
+   {
+    "id": 105,
+    "color": "red",
+    "number": 0,
+    "fake": true
+   },
+   {
+    "id": 21,
+    "color": "yellow",
+    "number": 9,
+    "fake": false
+   },
+   {
+    "id": 25,
+    "color": "yellow",
+    "number": 13,
+    "fake": false
+   },
+   {
+    "id": 65,
+    "color": "yellow",
+    "number": 1,
+    "fake": false
+   },
+   {
+    "id": 85,
+    "color": "blue",
+    "number": 8,
+    "fake": false
+   },
+   {
+    "id": 88,
+    "color": "blue",
+    "number": 11,
+    "fake": false
+   },
+   {
+    "id": 56,
+    "color": "red",
+    "number": 5,
+    "fake": false
+   },
+   {
+    "id": 24,
+    "color": "yellow",
+    "number": 12,
+    "fake": false
+   }
+  ],
+  "counts": [
+   21,
+   9,
+   21,
+   21
+  ],
+  "discards": [
+   [
+    {
+     "id": 68,
+     "color": "yellow",
+     "number": 4,
+     "fake": false
+    }
+   ],
+   [],
+   [],
+   []
+  ],
+  "melds": [
+   {
+    "id": 1,
+    "kind": "run",
+    "owner": 1,
+    "tiles": [
+     {
+      "id": 74,
+      "color": "yellow",
+      "number": 10,
+      "fake": false
+     },
+     {
+      "id": 23,
+      "color": "yellow",
+      "number": 11,
+      "fake": false
+     },
+     {
+      "id": 76,
+      "color": "yellow",
+      "number": 12,
+      "fake": false
+     },
+     {
+      "id": 77,
+      "color": "yellow",
+      "number": 13,
+      "fake": false
+     }
+    ]
+   },
+   {
+    "id": 2,
+    "kind": "run",
+    "owner": 1,
+    "tiles": [
+     {
+      "id": 60,
+      "color": "red",
+      "number": 9,
+      "fake": false
+     },
+     {
+      "id": 61,
+      "color": "red",
+      "number": 10,
+      "fake": false
+     },
+     {
+      "id": 78,
+      "color": "blue",
+      "number": 1,
+      "fake": false
+     }
+    ]
+   },
+   {
+    "id": 3,
+    "kind": "run",
+    "owner": 1,
+    "tiles": [
+     {
+      "id": 17,
+      "color": "yellow",
+      "number": 5,
+      "fake": false
+     },
+     {
+      "id": 70,
+      "color": "yellow",
+      "number": 6,
+      "fake": false
+     },
+     {
+      "id": 71,
+      "color": "yellow",
+      "number": 7,
+      "fake": false
+     }
+    ]
+   },
+   {
+    "id": 4,
+    "kind": "set",
+    "owner": 1,
+    "tiles": [
+     {
+      "id": 55,
+      "color": "red",
+      "number": 4,
+      "fake": false
+     },
+     {
+      "id": 29,
+      "color": "blue",
+      "number": 4,
+      "fake": false
+     },
+     {
+      "id": 94,
+      "color": "black",
+      "number": 4,
+      "fake": false
+     }
+    ]
+   }
+  ],
+  "opened": [
+   null,
+   "sets",
+   null,
+   null
+  ],
+  "penalties": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "requirement": {
+   "points": 101,
+   "pairs": 5
+  },
+  "turn": {
+   "seat": 1,
+   "number": 2,
+   "phase": "play",
+   "takenTileId": null,
+   "mustDrawFromStock": false
+  },
+  "clock": {
+   "seat": 1,
+   "endsIn": null,
+   "moveLeft": null,
+   "banks": [
+    0,
+    0,
+    0,
+    0
+   ]
+  }
+ },
+ "result": null,
+ "events": [
+  {
+   "type": "opened",
+   "seat": 1,
+   "kind": "sets",
+   "value": 106,
+   "meldIds": [
+    1,
+    2,
+    3,
+    4
+   ]
+  }
+ ]
+}

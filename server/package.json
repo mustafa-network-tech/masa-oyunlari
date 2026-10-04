@@ -9,7 +9,8 @@
     "start": "node dist/server.js",
     "test": "vitest run",
     "typecheck": "tsc -p .",
-    "loadtest": "tsx scripts/loadtest.ts"
+    "loadtest": "tsx scripts/loadtest.ts",
+    "fixtures": "tsx scripts/fixtures.ts"
   },
   "dependencies": {
     "@masa/engine": "*",
