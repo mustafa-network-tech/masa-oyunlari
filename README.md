@@ -21,7 +21,16 @@ npm run dev          # sunucuyu başlatır (ws://localhost:2567), kod değişinc
 npm test             # motor ve sunucu testleri
 npm run typecheck    # tip kontrolü
 npm run build        # sunucuyu server/dist/server.js olarak derler
+npm run loadtest -w @masa/server -- --tables 200 --hands 5   # çalışan sunucuya yük testi (--humans 1 ile botlu masalar)
 ```
+
+Sunucu ortam değişkenleri:
+| Değişken | Varsayılan | Açıklama |
+|---|---|---|
+| `PORT` | 2567 | WebSocket portu |
+| `HAND_LOG_DIR` | `logs` | El kayıtlarının (JSONL) yazıldığı klasör |
+| `STATS_INTERVAL_MS` | kapalı | Bağlantı, masa, bellek ve gecikmeyi düzenli yazar |
+| `BOT_DELAY_MS` | 900 | Bot adımları arası bekleme (yük testi için) |
 
 Uygulama (`app/` içinde):
 ```bash

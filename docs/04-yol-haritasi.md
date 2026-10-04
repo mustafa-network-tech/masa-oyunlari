@@ -77,12 +77,23 @@ Simülasyon sonucu: 3.300 elde hiç kural dışı hamle, sonsuz döngü veya cez
 ## Faz 4 — Online masa sunucusu
 **Hedef:** Gerçek oyuncuların hilesiz ve kesintisiz oynadığı sunucu.
 
-- [ ] 101 odası: bütün hamleler sunucuda kontrol edilir
-- [ ] Hamle süreleri ve zaman bankası
-- [ ] Bağlantı kopunca bot devralır, oyuncu 60 sn içinde dönerse aynı koltuğa oturur
-- [ ] Aynı mesajın iki kez gelmesine ve hızlı tıklamaya karşı koruma
-- [ ] Her elin olay kaydı (el sonradan baştan oynatılabilir)
-- [ ] Yük testi: aynı anda yüzlerce sanal masa
+- [x] 101 masası: bütün hamleler sunucuda motordan geçer, herkes yalnızca kendi taşlarını görür
+- [x] Adil Oyun turu: sunucu tohum özetini yayınlar, cihazlar kendi tohumunu gönderir, el sonunda açıklanır
+- [x] Hamle süreleri ve zaman bankası; süre dolunca otomatik hamle, üst üste 2'de "uzakta" ve yerine bot
+- [x] Bağlantı kopunca bot devralır, oyuncu 60 sn içinde dönerse aynı koltuğa oturur (koltuk jetonu)
+- [x] Aynı mesajın iki kez gelmesine (sıra numarası), hızlı tıklamaya (tur numarası) ve mesaj selline (hız sınırı) karşı koruma
+- [x] Her elin olay kaydı: tohumlar + sıralı hamleler, günlük JSONL dosyası. El baştan oynatılabilir.
+- [x] Yük testi: `npm run loadtest -w @masa/server`
+- [ ] 4 telefonla internet kesme denemesi (oyun ekranı gelince, Faz 5)
+
+Yük testi sonucu (geliştirme bilgisayarı, tek Node süreci):
+| Senaryo | Sonuç |
+|---|---|
+| 500 masa × 4 oyuncu (2.000 bağlantı), 5'er el | 500/500 maç bitti, saniyede 1.239 hamle, hamle onayı p99 13 ms, bellek 124 MB, hata yok |
+| 300 masa × 1 oyuncu + 3 bot, botlar gerçeğin 9 katı hızda | 300/300 maç bitti, hamle onayı p99 12 ms, bellek 153 MB, hata yok |
+| Kayıtlardan baştan oynatma | 4.250 elin hepsi aynı sonucu verdi |
+
+Otomatik testlerde 4 bağlantılı bir masada bağlantı kesilip yeni bağlantıyla dönülüyor ve oyun kaldığı yerden sürüyor. Flutter istemcisi de gerçek sunucuya karşı aynı senaryoyu geçiyor.
 
 **Çıkış kriteri:** 4 telefonla oynanan bir maçta interneti kesip açınca oyun kaldığı yerden devam ediyor. Yük testinde sunucu sorunsuz.
 

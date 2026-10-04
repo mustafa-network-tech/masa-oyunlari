@@ -9,7 +9,8 @@ import 'protocol.dart';
 
 enum ConnectionStatus { disconnected, connecting, connected, versionMismatch }
 
-/// Sunucuyla tek WebSocket bağlantısı. Koparsa artan aralıklarla yeniden bağlanır.
+/// Sunucuyla tek WebSocket bağlantısı. Koparsa artan aralıklarla yeniden bağlanır
+/// ve masadaysa aynı koltuğa geri oturur.
 class GameConnection extends ChangeNotifier {
   GameConnection(this.url);
 
@@ -17,7 +18,8 @@ class GameConnection extends ChangeNotifier {
 
   ConnectionStatus status = ConnectionStatus.disconnected;
   String? clientId;
-  RoomState? room;
+  TableSnapshot? room;
+  int? seat;
   int? latencyMs;
   String? lastError;
 
@@ -30,9 +32,12 @@ class GameConnection extends ChangeNotifier {
   final _pingSentAt = <int, int>{};
   int _pingCounter = 0;
 
-  // Yeniden bağlanınca katılacağımız oda.
+  // Yeniden bağlanınca katılacağımız masa. Koltuk jetonu varsa aynı koltuğa döneriz.
   String? _roomName;
   String? _playerName;
+  String? _seatToken;
+  int _seededHand = 0;
+  final _random = Random.secure();
 
   void connect() {
     _wanted = true;
@@ -49,15 +54,25 @@ class GameConnection extends ChangeNotifier {
   void join(String roomName, String playerName) {
     _roomName = roomName;
     _playerName = playerName;
+    _seatToken = null;
     _send(joinMessage(roomName, playerName));
   }
 
   void leave() {
     _roomName = null;
+    _seatToken = null;
+    seat = null;
     _send(leaveMessage());
     room = null;
     notifyListeners();
   }
+
+  /// Masa sahibi oyunu başlatır; boş koltuklara bot oturur.
+  void start() => _send(startMessage());
+
+  /// Ağ kopmasını taklit eder: bağlantı kapanır, yeniden bağlanma devreye girer.
+  @visibleForTesting
+  void simulateDrop() => _onLost();
 
   Future<void> _open() async {
     _close();
@@ -95,7 +110,9 @@ class GameConnection extends ChangeNotifier {
         lastError = null;
         _setStatus(ConnectionStatus.connected);
         _startPing();
-        if (_roomName != null && _playerName != null) {
+        if (_roomName != null && _seatToken != null) {
+          _send(resumeMessage(_roomName!, _seatToken!));
+        } else if (_roomName != null && _playerName != null) {
           _send(joinMessage(_roomName!, _playerName!));
         }
       case Pong(:final n):
@@ -104,11 +121,28 @@ class GameConnection extends ChangeNotifier {
           latencyMs = DateTime.now().millisecondsSinceEpoch - sentAt;
           notifyListeners();
         }
-      case RoomState():
-        room = msg;
+      case Seated(:final token, seat: final s):
+        _seatToken = token;
+        seat = s;
         notifyListeners();
-      case ServerError(:final message):
+      case TableSnapshot(:final seedingHand):
+        room = msg;
+        if (seedingHand != null && seedingHand != _seededHand) {
+          _seededHand = seedingHand;
+          _send(seedMessage(seedingHand, _newSeed()));
+        }
+        notifyListeners();
+      case Ack():
+        break;
+      case ServerError(:final code, :final message):
         lastError = message;
+        // Dönüş süresi dolduysa koltuk bota geçti; masadan çıkmış sayılırız.
+        if (code == 'seatLost' || code == 'badToken' || code == 'replaced') {
+          _roomName = null;
+          _seatToken = null;
+          seat = null;
+          room = null;
+        }
         notifyListeners();
       case null:
         break;
@@ -137,6 +171,12 @@ class GameConnection extends ChangeNotifier {
     ping();
     _pingTimer = Timer.periodic(const Duration(seconds: 5), (_) => ping());
   }
+
+  /// Adil Oyun: cihazda üretilen 32 baytlık rastgele tohum (64 hex karakter).
+  String _newSeed() => [
+        for (var i = 0; i < 32; i++)
+          _random.nextInt(256).toRadixString(16).padLeft(2, '0'),
+      ].join();
 
   void _send(Map<String, Object?> msg) {
     if (status != ConnectionStatus.connected) return;

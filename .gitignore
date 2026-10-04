@@ -10,3 +10,4 @@ coverage/
 *.jks
 *.keystore
 key.properties
+logs/

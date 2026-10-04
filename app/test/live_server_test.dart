@@ -16,13 +16,16 @@ Future<void> waitFor(GameConnection c, bool Function() condition) {
 
   c.addListener(listener);
   return done.future
-      .timeout(const Duration(seconds: 5))
+      .timeout(const Duration(seconds: 10))
       .whenComplete(() => c.removeListener(listener));
 }
 
 void main() {
+  final skip = liveServerUrl.isEmpty ? 'LIVE_SERVER_URL verilmedi' : false;
+  final room = 'canli-${DateTime.now().millisecondsSinceEpoch}';
+
   test(
-    'gerçek sunucuya bağlanır, ping ölçer ve odaya katılır',
+    'gerçek sunucuya bağlanır, ping ölçer ve masaya oturur',
     () async {
       final ali = GameConnection(Uri.parse(liveServerUrl))..connect();
       final veli = GameConnection(Uri.parse(liveServerUrl))..connect();
@@ -30,9 +33,9 @@ void main() {
       await waitFor(veli, () => veli.status == ConnectionStatus.connected);
       await waitFor(ali, () => ali.latencyMs != null);
 
-      ali.join('test-masa', 'Ali');
+      ali.join('$room-a', 'Ali');
       await waitFor(ali, () => ali.room?.players.length == 1);
-      veli.join('test-masa', 'Veli');
+      veli.join('$room-a', 'Veli');
       await waitFor(ali, () => ali.room?.players.length == 2);
       expect(ali.room!.players, ['Ali', 'Veli']);
 
@@ -40,6 +43,28 @@ void main() {
       await waitFor(ali, () => ali.room?.players.length == 1);
       ali.dispose();
     },
-    skip: liveServerUrl.isEmpty ? 'LIVE_SERVER_URL verilmedi' : false,
+    skip: skip,
+  );
+
+  test(
+    'oyun sırasında bağlantı koparsa aynı koltuğa döner',
+    () async {
+      final ali = GameConnection(Uri.parse(liveServerUrl))..connect();
+      await waitFor(ali, () => ali.status == ConnectionStatus.connected);
+      ali.join('$room-b', 'Ali');
+      await waitFor(ali, () => ali.seat != null);
+      ali.start();
+      // Tohum otomatik gönderilir, el dağıtılır.
+      await waitFor(ali, () => ali.room?.phase == 'playing');
+      final seat = ali.seat;
+
+      ali.simulateDrop();
+      await waitFor(ali, () => ali.status == ConnectionStatus.connecting);
+      await waitFor(ali, () => ali.room?.phase == 'playing');
+      expect(ali.seat, seat);
+      expect(ali.room!.json['you'], seat);
+      ali.dispose();
+    },
+    skip: skip,
   );
 }

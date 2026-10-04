@@ -1,19 +1,29 @@
 import { randomUUID } from 'node:crypto';
 import { WebSocketServer, type WebSocket } from 'ws';
-import { PROTOCOL_VERSION, parseClientMessage, type ServerMessage } from './protocol.ts';
+import type { HandLog } from './handLog.ts';
+import {
+  DEFAULT_SETTINGS,
+  ERROR_MESSAGES,
+  PROTOCOL_VERSION,
+  parseClientMessage,
+  type ErrorCode,
+  type ServerMessage,
+} from './protocol.ts';
+import { DEFAULT_TIMING, Table, type Player, type Timing } from './table.ts';
 
-// Faz 1: bağlantı, ping ve basit oda katılımı. Gerçek oyun odaları Faz 4'te gelecek.
-
-interface Client {
-  id: string;
+interface Client extends Player {
   socket: WebSocket;
-  name?: string;
-  room?: string;
   alive: boolean;
+  table?: Table;
+  /** Hız sınırı: saniyede `perSecond` jeton dolan kova. */
+  tokens: number;
+  refilledAt: number;
+  dropped: number;
 }
 
 export interface GameServer {
   port: number;
+  stats(): { clients: number; tables: number };
   close(): Promise<void>;
 }
 
@@ -21,76 +31,122 @@ export interface GameServerOptions {
   port: number;
   /** Ölü bağlantıları tespit etme aralığı (ms). */
   heartbeatMs?: number;
+  timing?: Partial<Timing>;
+  rateLimit?: { perSecond: number; burst: number };
+  onHandLog?: (log: HandLog) => void;
 }
+
+/** Bu kadar mesaj üst üste reddedilen bağlantı kapatılır. */
+const MAX_DROPPED = 200;
 
 export function createGameServer(options: GameServerOptions): Promise<GameServer> {
   const wss = new WebSocketServer({ port: options.port, maxPayload: 16 * 1024 });
+  const timing: Timing = { ...DEFAULT_TIMING, ...options.timing };
+  const rateLimit = options.rateLimit ?? { perSecond: 20, burst: 40 };
   const clients = new Set<Client>();
-  const rooms = new Map<string, Set<Client>>();
+  const tables = new Map<string, Table>();
 
-  const send = (client: Client, msg: ServerMessage) => {
-    if (client.socket.readyState === client.socket.OPEN) client.socket.send(JSON.stringify(msg));
+  const fail = (client: Client, code: ErrorCode) =>
+    client.send({ t: 'error', code, message: ERROR_MESSAGES[code] });
+
+  const allow = (client: Client): boolean => {
+    const now = Date.now();
+    client.tokens = Math.min(rateLimit.burst, client.tokens + ((now - client.refilledAt) / 1000) * rateLimit.perSecond);
+    client.refilledAt = now;
+    if (client.tokens >= 1) {
+      client.tokens--;
+      client.dropped = 0;
+      return true;
+    }
+    if (client.dropped++ === 0) fail(client, 'rateLimited');
+    if (client.dropped > MAX_DROPPED) client.socket.terminate();
+    return false;
   };
 
-  const playersIn = (room: string) => [...(rooms.get(room) ?? [])].map((c) => c.name ?? '?');
-
-  const broadcastRoom = (room: string) => {
-    const players = playersIn(room);
-    for (const member of rooms.get(room) ?? []) send(member, { t: 'roomUpdate', room, players });
+  const openTable = (room: string, settings = DEFAULT_SETTINGS): Table => {
+    const table: Table = new Table({
+      room,
+      settings,
+      timing,
+      onHandLog: options.onHandLog,
+      onEmpty: () => {
+        if (tables.get(room) === table) tables.delete(room);
+      },
+    });
+    tables.set(room, table);
+    return table;
   };
 
-  const leaveRoom = (client: Client) => {
-    const room = client.room;
-    if (!room) return;
-    const members = rooms.get(room);
-    members?.delete(client);
-    if (members?.size === 0) rooms.delete(room);
-    client.room = undefined;
-    broadcastRoom(room);
+  const leaveTable = (client: Client) => {
+    client.table?.leave(client);
+    client.table = undefined;
   };
 
   wss.on('connection', (socket) => {
-    const client: Client = { id: randomUUID(), socket, alive: true };
+    const client: Client = {
+      id: randomUUID(),
+      socket,
+      alive: true,
+      tokens: rateLimit.burst,
+      refilledAt: Date.now(),
+      dropped: 0,
+      send(msg: ServerMessage) {
+        if (socket.readyState === socket.OPEN) socket.send(JSON.stringify(msg));
+      },
+    };
     clients.add(client);
-    send(client, { t: 'welcome', protocol: PROTOCOL_VERSION, clientId: client.id });
+    client.send({ t: 'welcome', protocol: PROTOCOL_VERSION, clientId: client.id });
 
     socket.on('pong', () => {
       client.alive = true;
     });
 
     socket.on('message', (data, isBinary) => {
+      if (!allow(client)) return;
       const msg = isBinary ? null : parseClientMessage(data.toString());
-      if (!msg) {
-        send(client, { t: 'error', code: 'badMessage', message: 'Geçersiz mesaj' });
-        return;
-      }
+      if (!msg) return fail(client, 'badMessage');
+
       switch (msg.t) {
         case 'ping':
-          send(client, { t: 'pong', n: msg.n });
-          break;
+          return client.send({ t: 'pong', n: msg.n });
+
         case 'join': {
-          leaveRoom(client);
-          client.name = msg.name;
-          client.room = msg.room;
-          let members = rooms.get(msg.room);
-          if (!members) rooms.set(msg.room, (members = new Set()));
-          members.add(client);
-          send(client, { t: 'joined', room: msg.room, players: playersIn(msg.room) });
-          broadcastRoom(msg.room);
-          break;
+          leaveTable(client);
+          const table = tables.get(msg.room) ?? openTable(msg.room, { ...DEFAULT_SETTINGS, ...msg.settings });
+          if (table.join(client, msg.name)) client.table = table;
+          return;
         }
+
+        case 'resume': {
+          const table = tables.get(msg.room);
+          if (!table) return fail(client, 'badToken');
+          if (client.table !== table) leaveTable(client);
+          if (table.resume(client, msg.token)) client.table = table;
+          return;
+        }
+
         case 'leave':
-          if (!client.room) {
-            send(client, { t: 'error', code: 'notInRoom', message: 'Bir odada değilsin' });
-            break;
-          }
-          leaveRoom(client);
-          break;
+          if (!client.table) return fail(client, 'notInRoom');
+          return leaveTable(client);
+      }
+
+      const table = client.table;
+      if (!table) return fail(client, 'notInRoom');
+      switch (msg.t) {
+        case 'start':
+          return table.start(client);
+        case 'seed':
+          return table.seed(client, msg.hand, msg.seed);
+        case 'act':
+          return table.act(client, msg);
+        case 'back':
+          return table.back(client);
       }
     });
 
     socket.on('close', () => {
-      leaveRoom(client);
+      client.table?.disconnect(client);
+      client.table = undefined;
       clients.delete(client);
     });
   });
@@ -114,9 +170,12 @@ export function createGameServer(options: GameServerOptions): Promise<GameServer
       const port = typeof address === 'object' && address ? address.port : options.port;
       resolve({
         port,
+        stats: () => ({ clients: clients.size, tables: tables.size }),
         close: () =>
           new Promise<void>((done) => {
             clearInterval(heartbeat);
+            for (const table of tables.values()) table.close();
+            tables.clear();
             for (const client of clients) client.socket.terminate();
             wss.close(() => done());
           }),
