@@ -1,0 +1,12 @@
+node_modules/
+dist/
+coverage/
+*.log
+.env
+.env.*
+!.env.example
+
+# Android imzalama anahtarları asla depoya girmez
+*.jks
+*.keystore
+key.properties
